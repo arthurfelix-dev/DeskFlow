@@ -30,9 +30,15 @@ public class ChamadosController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Chamado>> Criar([FromBody] Chamado chamado)
+    public async Task<ActionResult<Chamado>> Criar(
+        [FromBody] Chamado chamado)
     {
         var novoChamado = await _service.CriarAsync(chamado);
+
+        if (novoChamado == null)
+        {
+            return BadRequest("A categoria informada não existe.");
+        }
 
         return CreatedAtAction(
             nameof(BuscarPorId),
@@ -54,31 +60,31 @@ public class ChamadosController : ControllerBase
     }
 
     [HttpPost("{id}/iniciar")]
-public async Task<ActionResult<Chamado>> Iniciar(int id)
-{
-    var chamado = await _service.IniciarAsync(id);
-
-    if (chamado == null)
+    public async Task<ActionResult<Chamado>> Iniciar(int id)
     {
-        return NotFound();
+        var chamado = await _service.IniciarAsync(id);
+
+        if (chamado == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(chamado);
     }
 
-    return Ok(chamado);
-}
-
-[HttpPost("{id}/encerrar")]
-public async Task<ActionResult<Chamado>> Encerrar(
-    int id,
-    [FromBody] string solucao)
-{
-    var chamado = await _service.EncerrarAsync(id, solucao);
-
-    if (chamado == null)
+    [HttpPost("{id}/encerrar")]
+    public async Task<ActionResult<Chamado>> Encerrar(
+        int id,
+        [FromBody] string solucao)
     {
-        return BadRequest("Não foi possível encerrar o chamado. Verifique se a solução foi informada e se o chamado ainda não está fechado.");
+        var chamado = await _service.EncerrarAsync(id, solucao);
+
+        if (chamado == null)
+        {
+            return BadRequest(
+                "Não foi possível encerrar o chamado. Verifique se a solução foi informada e se o chamado ainda não está fechado.");
+        }
+
+        return Ok(chamado);
     }
-
-    return Ok(chamado);
-}
-
 }

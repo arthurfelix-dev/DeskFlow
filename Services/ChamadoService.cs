@@ -40,8 +40,16 @@ public class ChamadoService
         return await query.ToListAsync();
     }
 
-    public async Task<Chamado> CriarAsync(Chamado chamado)
+    public async Task<Chamado?> CriarAsync(Chamado chamado)
     {
+        var categoriaExiste = await _context.Categorias
+            .AnyAsync(c => c.Id == chamado.CategoriaId);
+
+        if (!categoriaExiste)
+        {
+            return null;
+        }
+
         chamado.Status = "Aberto";
         chamado.DataAbertura = DateTime.Now;
 
