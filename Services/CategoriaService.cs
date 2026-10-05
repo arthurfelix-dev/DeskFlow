@@ -34,7 +34,9 @@ public class CategoriaService
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public async Task<Categoria?> AtualizarAsync(int id, Categoria categoria)
+    public async Task<Categoria?> AtualizarAsync(
+        int id,
+        Categoria categoria)
     {
         var categoriaExistente = await BuscarPorIdAsync(id);
 
@@ -50,14 +52,14 @@ public class CategoriaService
         return categoriaExistente;
     }
 
-    public async Task<bool> ExcluirAsync(int id)
+    public async Task<string> ExcluirAsync(int id)
     {
         var categoria = await _context.Categorias
             .FirstOrDefaultAsync(c => c.Id == id);
 
         if (categoria == null)
         {
-            return false;
+            return "nao_encontrada";
         }
 
         var possuiChamados = await _context.Chamados
@@ -65,13 +67,13 @@ public class CategoriaService
 
         if (possuiChamados)
         {
-            return false;
+            return "possui_chamados";
         }
 
         _context.Categorias.Remove(categoria);
 
         await _context.SaveChangesAsync();
 
-        return true;
+        return "excluida";
     }
 }

@@ -24,7 +24,8 @@ public class CategoriaController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<Categoria>> Criar(Categoria categoria)
+    public async Task<ActionResult<Categoria>> Criar(
+        Categoria categoria)
     {
         var novaCategoria = await _service.CriarAsync(categoria);
 
@@ -48,9 +49,12 @@ public class CategoriaController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<Categoria>> Atualizar(int id, Categoria categoria)
+    public async Task<ActionResult<Categoria>> Atualizar(
+        int id,
+        Categoria categoria)
     {
-        var categoriaAtualizada = await _service.AtualizarAsync(id, categoria);
+        var categoriaAtualizada =
+            await _service.AtualizarAsync(id, categoria);
 
         if (categoriaAtualizada == null)
         {
@@ -62,16 +66,20 @@ public class CategoriaController : ControllerBase
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Excluir(int id)
-{
-    var excluida = await _service.ExcluirAsync(id);
-
-    if (!excluida)
     {
-        return NotFound();
+        var resultado = await _service.ExcluirAsync(id);
+
+        if (resultado == "nao_encontrada")
+        {
+            return NotFound();
+        }
+
+        if (resultado == "possui_chamados")
+        {
+            return Conflict(
+                "Não é possível excluir a categoria porque existem chamados associados a ela.");
+        }
+
+        return NoContent();
     }
-
-    return NoContent();
 }
-
-}
-
